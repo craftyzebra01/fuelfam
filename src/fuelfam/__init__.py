@@ -2,7 +2,7 @@ import os
 import base64
 import requests
 import json
-from fuelfam.imp import imp
+# from fuelfam.imp import imp
 from dotenv import load_dotenv
 from anthropic import Anthropic
 from PIL import Image
@@ -30,7 +30,9 @@ class GasStationImageInfo(BaseModel):
     station_name: str
     fuel_prices: list[FuelPrice]
 
-def search_nearby(lat, long, radius=500.0, max_results=10, included_types=["gas_station"]):
+def search_nearby(lat, long, radius=500.0, max_results=10, included_types=None):
+    if included_types is None:
+        included_types = ["gas_station"]
     headers = {
         "Content-Type": "application/json",
         "X-Goog-Api-Key": GOOGLE_MAPS_API_KEY,
