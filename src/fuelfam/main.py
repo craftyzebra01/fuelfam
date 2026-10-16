@@ -21,6 +21,11 @@ upload_requests = InMemoryUploadRequestProvider()
 app = FastAPI()
 
 
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+
 @app.post("/uploadStationInfo", response_model=StationConfirmation)
 def upload_station_info(file: UploadFile):
     image_bytes = file.file.read()
