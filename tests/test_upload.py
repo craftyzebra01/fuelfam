@@ -47,6 +47,10 @@ def test_upload_returns_confirmation(monkeypatch):
     assert body["parsed"] == parsed.model_dump()
     assert body["matches"] == [match.model_dump() for match in matches]
     assert calls == [(b"img", "sign.jpg", "image/jpeg")]
+    stored = main.upload_requests.get(body["upload_id"])
+    assert stored is not None
+    assert stored.upload_id == body["upload_id"]
+    assert stored.matches == matches
 
 
 def test_upload_defaults_missing_content_type_and_filename(monkeypatch):
@@ -81,6 +85,7 @@ def test_upload_without_gps_is_bad_request(monkeypatch):
         raise MissingGpsError("Image has no GPS data")
 
     monkeypatch.setattr(main.scoring_provider, "score_image", fake_score)
+    before = dict(main.upload_requests.requests)
 
     response = client.post(
         "/uploadStationInfo",
@@ -89,6 +94,7 @@ def test_upload_without_gps_is_bad_request(monkeypatch):
 
     assert response.status_code == 400
     assert response.json()["detail"] == "Image has no GPS data"
+    assert main.upload_requests.requests == before
 
 
 def test_confirm_returns_success():
